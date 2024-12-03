@@ -309,12 +309,6 @@ Transform:
   - {fileID: 1963988510}
   m_Father: {fileID: 1992753168}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &225105479 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2318994501464711413, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
-    type: 3}
-  m_PrefabInstance: {fileID: 991400003709109292}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &321269761
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,12 +1090,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 947223202}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &966544730 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 428437052809664607, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
-    type: 3}
-  m_PrefabInstance: {fileID: 991400003709109292}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &986139489
 GameObject:
   m_ObjectHideFlags: 0
@@ -1637,12 +1625,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1051225408}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1124336237 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5714075035924913499, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
-    type: 3}
-  m_PrefabInstance: {fileID: 991400003709109292}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1145134118 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8024307186196653020, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
@@ -1685,29 +1667,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1145134118}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1dfa55c904f5a6e4a8f9e157057f31d1, type: 3}
+  m_Script: {fileID: 11500000, guid: b420c2a0f475e924caf0dd8490a57399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wheels: []
-  motorTorque: 200
---- !u!114 &1145134121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  MotorA: {fileID: 49523050}
+  MotorB: {fileID: 481092781}
+  MotorC: {fileID: 9592383}
+  vehicle: {fileID: 1145134121}
+  limit: 40
+--- !u!4 &1145134121 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6973572818443283078, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
+    type: 3}
+  m_PrefabInstance: {fileID: 991400003709109292}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1145134118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ded3705f308433e458a8f634b44f9a37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  propellers:
-  - {fileID: 966544730}
-  - {fileID: 225105479}
-  - {fileID: 1124336237}
-  thrustPower: 500
-  rb: {fileID: 1145134119}
 --- !u!1 &1363229958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,15 +2838,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8024307186196653020, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1145134121}
+      addedObject: {fileID: 1145134119}
     - targetCorrespondingSourceObject: {fileID: 8024307186196653020, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1145134120}
-    - targetCorrespondingSourceObject: {fileID: 8024307186196653020, guid: d1e4fdfbae54eb24cbda780eb2c4409a,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1145134119}
   m_SourcePrefab: {fileID: 100100000, guid: d1e4fdfbae54eb24cbda780eb2c4409a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
