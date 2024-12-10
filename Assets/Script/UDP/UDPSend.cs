@@ -143,60 +143,32 @@ public class UDPSend : MonoBehaviour
     }
     void CalcularRotacion()
     {
+        Quaternion currentRotation = vehicle.rotation;
+        Vector3 eulerAngles = currentRotation.eulerAngles;
 
-        //Quaternion rotY = vehicle.rotation;
-        //rotY.x = 0;
-        //rotY.z = 0;
+        float servoPitch = Mathf.Clamp(eulerAngles.x, 0, 180);
+        float servoYaw = Mathf.Clamp(eulerAngles.y, 0, 180);
+        float servoRoll = Mathf.Clamp(eulerAngles.z, 0, 180);
 
-        //// rotate left or Right
-        //Vector3 Vb1 = vehicle.position + vehicle.rotation * Vector3.right * longg;
-        //Vector3 Vb2 = vehicle.position + rotY * Vector3.right * longg;
+        string hexPitch = DecToHexMove(servoPitch);
+        string hexYaw = DecToHexMove(servoYaw);
+        string hexRoll = DecToHexMove(servoRoll);
 
-        //// rotate forward or back
-        //Vector3 VbA1 = vehicle.position + vehicle.rotation * Vector3.forward * longg;
-        //Vector3 VbA2 = vehicle.position + rotY * Vector3.forward * longg;
+        Debug.Log($"Servo Pitch (Hex): {hexPitch}, Servo Yaw (Hex): {hexYaw}, Servo Roll (Hex): {hexRoll}");
 
-        // TIENES QUE SEGUIR PROGRAMANDO ACAAAAAAAAAAAAAA
+        mUDPDATA.mAppDataField.PlayMotorA = hexPitch;
+        mUDPDATA.mAppDataField.PlayMotorB = hexYaw;
+        mUDPDATA.mAppDataField.PlayMotorC = hexRoll;
 
-        // Usaremos las variables A, B, C para determinar el comportamiento de la rotación.
-        // A: Eje de pitch (arriba / abajo)
-        // B: Eje de yaw (giro horizontal)
-        // C: Eje de roll (rotación lateral)
-
-        // Normalizamos A, B, C a un rango más manejable si es necesario.
-        float pitchInput = Mathf.Clamp(A - 125, -1f, 1f);  // A = 125 es el valor neutral
-        float yawInput = Mathf.Clamp(B - 125, -1f, 1f);    // B = 125 es el valor neutral
-        float rollInput = Mathf.Clamp(C - 125, -1f, 1f);   // C = 125 es el valor neutral
-
-        // Aplicamos las entradas de rotación a los ejes correspondientes
-
-        // 1. Pitch: Subir y bajar (eje X)
-        // Modificamos la rotación alrededor del eje X del avión
-        float pitchRotation = pitchInput * 30f;  // A 30 grados de rotación máxima en pitch
-        Quaternion newRotationPitch = Quaternion.Euler(pitchRotation, vehicle.rotation.eulerAngles.y, vehicle.rotation.eulerAngles.z);
-
-        // 2. Yaw: Girar a la izquierda o derecha (eje Y)
-        // Modificamos la rotación alrededor del eje Y del avión
-        float yawRotation = yawInput * 30f;  // A 30 grados de rotación máxima en yaw
-        Quaternion newRotationYaw = Quaternion.Euler(vehicle.rotation.eulerAngles.x, vehicle.rotation.eulerAngles.y + yawRotation, vehicle.rotation.eulerAngles.z);
-
-        // 3. Roll: Girar lateralmente (eje Z)
-        // Modificamos la rotación alrededor del eje Z del avión
-        float rollRotation = rollInput * 30f;  // A 30 grados de rotación máxima en roll
-        Quaternion newRotationRoll = Quaternion.Euler(vehicle.rotation.eulerAngles.x, vehicle.rotation.eulerAngles.y, vehicle.rotation.eulerAngles.z + rollRotation);
-
-        // Aplicamos las rotaciones de pitch, yaw y roll juntas
-        vehicle.rotation = newRotationYaw * newRotationPitch * newRotationRoll;
-
-        // También se puede usar la física para una simulación más realista con Rigidbody
-        // Si tienes un Rigidbody en el avión, podrías usar lo siguiente:
-        // Rigidbody rb = vehicle.GetComponent<Rigidbody>();
-        // rb.AddTorque(new Vector3(pitchInput, yawInput, rollInput) * torqueMultiplier);
+        sendString(mUDPDATA.GetToString());
 
     }
 
     void FixedUpdate()
     {
+        //Debug.Log("CalcularRotacion ejecutándose..."); 
+        //Debug.Log($"Current Rotation: {vehicle.rotation.eulerAngles}");
+
         if (active)
         {
 
@@ -305,7 +277,7 @@ public class UDPSend : MonoBehaviour
         B = Mathf.Lerp(B, FinalValue, Time.deltaTime * 20f);
         B = Mathf.Clamp(B, 0, 200);
 
-        Debug.Log(B);
+        //Debug.Log(B);
 
         #region WorldSpace
         Gizmos.color = Color.blue;
