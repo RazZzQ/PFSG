@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class PlaneControll : MonoBehaviour
 {
-    public Rigidbody rb;  // El Rigidbody del avión, usado para aplicar fuerzas físicas
     public float maxSpeed = 200f;  // Velocidad máxima
     public float pitchSpeed = 5f;  // Velocidad de rotación alrededor del eje X (pitch)
     public float rollSpeed = 5f;  // Velocidad de rotación alrededor del eje Y (alabeo)
     public float yawSpeed = 5f;   // Velocidad de rotación alrededor del eje Z (guiñada)
     public float thrust = 50f;     // Potencia del motor (aceleración)
 
+    public Camera mainCamera;      // Referencia a la cámara principal
+
     private float rollInput;
     private float pitchInput;
     private float yawInput;
     private float throttleInput;
 
+    private Vector3 velocity; // La velocidad del avión en el espacio
+
     // Start is called before the first frame update
     void Start()
     {
-        if (rb == null)
-        {
-            rb = GetComponent<Rigidbody>(); // Asegúrate de que se asigna el Rigidbody
-        }
+        velocity = Vector3.zero; // Inicializar la velocidad en cero
     }
 
     // Update is called once per frame
@@ -35,19 +35,19 @@ public class PlaneControll : MonoBehaviour
         throttleInput = 0f;
 
         // Controles de rotación (alabeo, pitch, guiñada)
-        if (Input.GetKey(KeyCode.W)) // Girar a la izquierda (alabeo)
+        if (Input.GetKey(KeyCode.A)) // Girar a la izquierda (alabeo)
         {
             rollInput = -1f;
         }
-        if (Input.GetKey(KeyCode.S)) // Girar a la derecha (alabeo)
+        if (Input.GetKey(KeyCode.D)) // Girar a la derecha (alabeo)
         {
             rollInput = 1f;
         }
-        if (Input.GetKey(KeyCode.A)) // Elevar (pitch hacia arriba)
+        if (Input.GetKey(KeyCode.W)) // Elevar (pitch hacia arriba)
         {
             pitchInput = 1f;
         }
-        if (Input.GetKey(KeyCode.D)) // Bajar (pitch hacia abajo)
+        if (Input.GetKey(KeyCode.S)) // Bajar (pitch hacia abajo)
         {
             pitchInput = -1f;
         }
@@ -78,13 +78,12 @@ public class PlaneControll : MonoBehaviour
     {
         // Aceleración
         float currentThrottle = throttleInput * thrust;
-        Vector3 forwardMovement = transform.forward * currentThrottle * Time.deltaTime;  // Movimiento hacia adelante
-        rb.AddForce(forwardMovement, ForceMode.Force);  // Aplicar la fuerza hacia adelante
+        velocity += transform.forward * currentThrottle * Time.deltaTime;  // Movimiento hacia adelante
 
         // Controlar velocidad máxima
-        if (rb.velocity.magnitude > maxSpeed)
+        if (velocity.magnitude > maxSpeed)
         {
-            rb.velocity = rb.velocity.normalized * maxSpeed;  // Limitar la velocidad máxima
+            velocity = velocity.normalized * maxSpeed;  // Limitar la velocidad máxima
         }
 
         // Aplicar rotaciones
@@ -93,8 +92,14 @@ public class PlaneControll : MonoBehaviour
         float yaw = yawInput * yawSpeed * Time.deltaTime;     // Guiñada
 
         // Rotar el avión
-        rb.AddTorque(transform.forward * pitch, ForceMode.Force);  // Pitch (X)
-        rb.AddTorque(transform.right * roll, ForceMode.Force);     // Alabeo (Y)
-        rb.AddTorque(transform.up * yaw, ForceMode.Force);        // Guiñada (Z)
+        transform.Rotate(pitch, yaw, roll); // Aplicar rotación utilizando el método Rotate del Transform
+
+        // Mover el avión en la dirección del forward de la cámara
+        Vector3 cameraForward = mainCamera.transform.forward;
+        cameraForward.y = 0f; // Evitar que el avión se mueva hacia arriba o abajo en función de la inclinación de la cámara
+        cameraForward.Normalize();  // Normalizar para que la velocidad sea consistente
+
+        // Mover el avión en dirección al "forward" de la cámara
+        transform.position += cameraForward * velocity.magnitude * Time.deltaTime;
     }
 }

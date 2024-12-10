@@ -37,7 +37,8 @@ public class UDPSend : MonoBehaviour
     public float A = 0, B = 0, C = 0, longg;
 
     public Transform vehicle;
-
+    private float servoPitch;
+    private float servoRoll;
     // start from unity3d
     public void Start()
     {
@@ -72,9 +73,9 @@ public class UDPSend : MonoBehaviour
 
         mUDPDATA.mAppDataField.PortOut = "12345678";
 
-        A = 125;
-        B = 125;
-        C = 125;
+        //A = 125;
+        //B = 125;
+        //C = 125;
 
         sliderA.value = A;
         sliderB.value = B;
@@ -143,25 +144,63 @@ public class UDPSend : MonoBehaviour
     }
     void CalcularRotacion()
     {
-        Quaternion currentRotation = vehicle.rotation;
-        Vector3 eulerAngles = currentRotation.eulerAngles;
+        void AplicarLerp(ref float variable, float objetivo, float suavizado)
+        {
+            variable = Mathf.Lerp(variable, objetivo, Time.deltaTime * suavizado);
+        }
 
-        float servoPitch = Mathf.Clamp(eulerAngles.x, 0, 180);
-        float servoYaw = Mathf.Clamp(eulerAngles.y, 0, 180);
-        float servoRoll = Mathf.Clamp(eulerAngles.z, 0, 180);
+        // Calcular la rotación en el eje Z
+        if (vehicle.eulerAngles.z > 0.1f && vehicle.eulerAngles.z < 180f)
+        {
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+        }
+        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f)
+        {
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+        }
+        else
+        {
+            AplicarLerp(ref B, 100f, SmoothEngine);
+            AplicarLerp(ref C, 100f, SmoothEngine);
+        }
 
-        string hexPitch = DecToHexMove(servoPitch);
-        string hexYaw = DecToHexMove(servoYaw);
-        string hexRoll = DecToHexMove(servoRoll);
+        // Calcular la rotación en el eje X
+        if (vehicle.eulerAngles.x > 2f && vehicle.eulerAngles.x < 180f)
+        {
+            AplicarLerp(ref A, 200f, SmoothEngine);
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+        }
+        else if (vehicle.eulerAngles.x >= 180f && vehicle.eulerAngles.x <= 360f)
+        {
+            AplicarLerp(ref A, 0f, SmoothEngine);
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+        }
+        else
+        {
+            AplicarLerp(ref A, 100f, SmoothEngine);
+            AplicarLerp(ref B, 100f, SmoothEngine);
+            AplicarLerp(ref C, 100f, SmoothEngine);
+        }
 
-        Debug.Log($"Servo Pitch (Hex): {hexPitch}, Servo Yaw (Hex): {hexYaw}, Servo Roll (Hex): {hexRoll}");
+        // Debug values for verification
+        Debug.Log($"Servo A: {A}, Servo B: {B}, Servo C: {C}");
 
-        mUDPDATA.mAppDataField.PlayMotorA = hexPitch;
-        mUDPDATA.mAppDataField.PlayMotorB = hexYaw;
-        mUDPDATA.mAppDataField.PlayMotorC = hexRoll;
+        // Convert to hexadecimal (example function: DecToHexMove)
+        string hexA = DecToHexMove(A);
+        string hexB = DecToHexMove(B);
+        string hexC = DecToHexMove(C);
 
+        // Assign to mUDPDATA fields
+        mUDPDATA.mAppDataField.PlayMotorA = hexA;
+        mUDPDATA.mAppDataField.PlayMotorB = hexB;
+        mUDPDATA.mAppDataField.PlayMotorC = hexC;
+
+        // Send updated data
         sendString(mUDPDATA.GetToString());
-
     }
 
     void FixedUpdate()
@@ -260,24 +299,21 @@ public class UDPSend : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (vehicle == null) return;
 
-        // rotate left or Right
-        Vector3 FG1 = vehicle.position + Vector3.forward * longg;
-        Vector3 FG2 = vehicle.position + vehicle.forward * longg;
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(FG1, FG2);
-        float d = (FG1 - FG2).magnitude;
-        float dMax = 5;
-        float dN = d / dMax;
-        float Increment = dN * 100;
-        Vector3 cross = Vector3.Cross(vehicle.forward, Vector3.forward);
-        if (cross.x < 0)
-            Increment *= -1;
-        float FinalValue = 100 + Increment;
-        B = Mathf.Lerp(B, FinalValue, Time.deltaTime * 20f);
-        B = Mathf.Clamp(B, 0, 200);
+        Vector3 position = vehicle.position;
 
-        //Debug.Log(B);
+        // Draw Servo A (Front)
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(position, position + Quaternion.Euler(vehicle.rotation.eulerAngles.x, 0, 0) * Vector3.forward * 2);
+
+        // Draw Servo B (Left wing)
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(position, position + Quaternion.Euler(0, 0, vehicle.rotation.eulerAngles.z) * Vector3.left * 2);
+
+        // Draw Servo C (Right wing)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(position, position + Quaternion.Euler(0, 0, vehicle.rotation.eulerAngles.z) * Vector3.right * 2);
 
         #region WorldSpace
         Gizmos.color = Color.blue;
@@ -310,3 +346,5 @@ public class UDPSend : MonoBehaviour
     }
 
 }
+
+
