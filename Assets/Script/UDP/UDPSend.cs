@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
 using Slider = UnityEngine.UI.Slider;
-
+using TMPro;
 public class UDPSend : MonoBehaviour
 {
 
@@ -16,13 +16,13 @@ public class UDPSend : MonoBehaviour
 
     private string IP;  // define in init
     public int port;  // define in init
-    public Text engineA;
+    public TextMeshPro engineA;
     public Text engineAHex;
     public Slider sliderA;
-    public Text engineB;
+    public TextMeshPro engineB;
     public Text engineBHex;
     public Slider sliderB;
-    public Text engineC;
+    public TextMeshPro engineC;
     public Text engineCHex;
     public Slider sliderC;
 
@@ -149,22 +149,6 @@ public class UDPSend : MonoBehaviour
             variable = Mathf.Lerp(variable, objetivo, Time.deltaTime * suavizado);
         }
 
-        // Calcular la rotación en el eje Z
-        if (vehicle.eulerAngles.z > 0.1f && vehicle.eulerAngles.z < 180f)
-        {
-            AplicarLerp(ref B, 200f, SmoothEngine);
-            AplicarLerp(ref C, 0f, SmoothEngine);
-        }
-        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f)
-        {
-            AplicarLerp(ref B, 0f, SmoothEngine);
-            AplicarLerp(ref C, 200f, SmoothEngine);
-        }
-        else
-        {
-            AplicarLerp(ref B, 100f, SmoothEngine);
-            AplicarLerp(ref C, 100f, SmoothEngine);
-        }
 
         // Calcular la rotación en el eje X
         if (vehicle.eulerAngles.x > 2f && vehicle.eulerAngles.x < 180f)
@@ -186,6 +170,22 @@ public class UDPSend : MonoBehaviour
             AplicarLerp(ref C, 100f, SmoothEngine);
         }
 
+        // Calcular la rotación en el eje Z
+        if (vehicle.eulerAngles.z > 2f && vehicle.eulerAngles.z < 180f)
+        {
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+        }
+        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f)
+        {
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+        }
+        else
+        {
+            AplicarLerp(ref B, 100f, SmoothEngine);
+            AplicarLerp(ref C, 100f, SmoothEngine);
+        }
         // Debug values for verification
         Debug.Log($"Servo A: {A}, Servo B: {B}, Servo C: {C}");
 
@@ -213,26 +213,26 @@ public class UDPSend : MonoBehaviour
 
             CalcularRotacion();
 
-            sliderA.value = A;
+            /*sliderA.value = A;
             sliderB.value = B;
-            sliderC.value = C;
+            sliderC.value = C;*/
 
             string HexA = DecToHexMove(A);
             string HexB = DecToHexMove(B);
             string HexC = DecToHexMove(C);
 
-            engineAHex.text = "Engine A: " + HexA;
+            /*engineAHex.text = "Engine A: " + HexA;
             engineBHex.text = "Engine B: " + HexB;
-            engineCHex.text = "Engine C: " + HexC;
+            engineCHex.text = "Engine C: " + HexC;*/
 
             mUDPDATA.mAppDataField.PlayMotorC = HexC;
             mUDPDATA.mAppDataField.PlayMotorA = HexA;
             mUDPDATA.mAppDataField.PlayMotorB = HexB;
 
 
-            engineA.text = ((int)sliderA.value).ToString();
-            engineB.text = ((int)sliderB.value).ToString();
-            engineC.text = ((int)sliderC.value).ToString();
+            engineA.text = ((int)A).ToString();
+            engineB.text = ((int)B).ToString();
+            engineC.text = ((int)C).ToString();
 
             Data.text = "Data: " + mUDPDATA.GetToString();
 
@@ -299,21 +299,6 @@ public class UDPSend : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (vehicle == null) return;
-
-        Vector3 position = vehicle.position;
-
-        // Draw Servo A (Front)
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(position, position + Quaternion.Euler(vehicle.rotation.eulerAngles.x, 0, 0) * Vector3.forward * 2);
-
-        // Draw Servo B (Left wing)
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(position, position + Quaternion.Euler(0, 0, vehicle.rotation.eulerAngles.z) * Vector3.left * 2);
-
-        // Draw Servo C (Right wing)
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(position, position + Quaternion.Euler(0, 0, vehicle.rotation.eulerAngles.z) * Vector3.right * 2);
 
         #region WorldSpace
         Gizmos.color = Color.blue;
