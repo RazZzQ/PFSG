@@ -142,52 +142,81 @@ public class UDPSend : MonoBehaviour
         //C = (float)(Mathf.Clamp(valueMotor, 0, 250));
 
     }
+    void AplicarLerp(ref float variable, float objetivo, float suavizado)
+    {
+        variable = Mathf.Lerp(variable, objetivo, suavizado * Time.deltaTime);
+    }
     void CalcularRotacion()
     {
-        void AplicarLerp(ref float variable, float objetivo, float suavizado)
+        // Combinamos las condiciones de Z y X en un único bloque
+        if (vehicle.eulerAngles.z > 0f && vehicle.eulerAngles.z < 180f && vehicle.eulerAngles.x > 0f && vehicle.eulerAngles.x < 180f)
         {
-            variable = Mathf.Lerp(variable, objetivo, Time.deltaTime * suavizado);
+            // Condición: Z entre 0 y 180, y X entre 0 y 180
+            AplicarLerp(ref A, 200f, SmoothEngine);
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+            Debug.Log("1");
         }
-
-
-        // Calcular la rotación en el eje X
-        if (vehicle.eulerAngles.x > 2f && vehicle.eulerAngles.x < 180f)
+        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f && vehicle.eulerAngles.x > 0f && vehicle.eulerAngles.x < 180f)
         {
+            // Condición: Z entre 180 y 360, y X entre 0 y 180
+            AplicarLerp(ref A, 200f, SmoothEngine);
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+            Debug.Log("2");
+        }
+        else if (vehicle.eulerAngles.z > 0f && vehicle.eulerAngles.z < 180f && vehicle.eulerAngles.x >= 180f && vehicle.eulerAngles.x <= 360f)
+        {
+            // Condición: Z entre 0 y 180, y X entre 180 y 360
+            AplicarLerp(ref A, 0f, SmoothEngine);
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+            Debug.Log("3");
+        }
+        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f && vehicle.eulerAngles.x >= 180f && vehicle.eulerAngles.x <= 360f)
+        {
+            // Condición: Z entre 180 y 360, y X entre 180 y 360
+            AplicarLerp(ref A, 0f, SmoothEngine);
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+            Debug.Log("4");
+        }
+        else if (vehicle.eulerAngles.z > 0f && vehicle.eulerAngles.z < 180f)
+        {
+            // Solo Z entre 0 y 180
+            AplicarLerp(ref B, 200f, SmoothEngine);
+            AplicarLerp(ref C, 0f, SmoothEngine);
+        }
+        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f)
+        {
+            // Solo Z entre 180 y 360
+            AplicarLerp(ref B, 0f, SmoothEngine);
+            AplicarLerp(ref C, 200f, SmoothEngine);
+        }
+        else if (vehicle.eulerAngles.x > 0f && vehicle.eulerAngles.x < 180f)
+        {
+            // Solo X entre 0 y 180
             AplicarLerp(ref A, 200f, SmoothEngine);
             AplicarLerp(ref B, 0f, SmoothEngine);
             AplicarLerp(ref C, 0f, SmoothEngine);
         }
         else if (vehicle.eulerAngles.x >= 180f && vehicle.eulerAngles.x <= 360f)
         {
+            // Solo X entre 180 y 360
             AplicarLerp(ref A, 0f, SmoothEngine);
             AplicarLerp(ref B, 200f, SmoothEngine);
             AplicarLerp(ref C, 200f, SmoothEngine);
         }
         else
         {
+            // Condición general
             AplicarLerp(ref A, 100f, SmoothEngine);
             AplicarLerp(ref B, 100f, SmoothEngine);
             AplicarLerp(ref C, 100f, SmoothEngine);
         }
 
-        // Calcular la rotación en el eje Z
-        if (vehicle.eulerAngles.z > 2f && vehicle.eulerAngles.z < 180f)
-        {
-            AplicarLerp(ref B, 200f, SmoothEngine);
-            AplicarLerp(ref C, 0f, SmoothEngine);
-        }
-        else if (vehicle.eulerAngles.z >= 180f && vehicle.eulerAngles.z <= 360f)
-        {
-            AplicarLerp(ref B, 0f, SmoothEngine);
-            AplicarLerp(ref C, 200f, SmoothEngine);
-        }
-        else
-        {
-            AplicarLerp(ref B, 100f, SmoothEngine);
-            AplicarLerp(ref C, 100f, SmoothEngine);
-        }
         // Debug values for verification
-        Debug.Log($"Servo A: {A}, Servo B: {B}, Servo C: {C}");
+        //Debug.Log($"Servo A: {A}, Servo B: {B}, Servo C: {C}");
 
         // Convert to hexadecimal (example function: DecToHexMove)
         string hexA = DecToHexMove(A);
@@ -276,7 +305,7 @@ public class UDPSend : MonoBehaviour
             {
 
                 //byte[] data = StringToByteArray(message);
-                print(message);
+                //print(message);
                 // Den message zum Remote-Client senden.
                 //client.Send(data, data.Length, remoteEndPoint);
 
